@@ -59,14 +59,19 @@ namespace FunctionTypes
             return Expression.Lambda(call, values).Compile() as Func<Value[], Value>;
         }
 
-        public bool MatchTypes(Function other)
+        public bool SignaturesMatch(Function other)
         {
             return Returns == other.Returns && Parameters.Zip(other.Parameters, (l, r) => l == r).Aggregate((v0, v1) => v0 && v1);
         }
 
+        public bool TypesMatch(Function other)
+        {
+            return other.Parameters.Length == 1 && other.Parameters[0] == Returns;
+        }
+
         public Function Concat(Function andThen)
         {
-            if (MatchTypes(andThen))
+            if (TypesMatch(andThen))
                 return new Function(Delegate.Combine(func, andThen.func));
             else
                 throw new Exception("Incompatible function signatures!");
